@@ -63,7 +63,7 @@ function Index() {
             height={1280}
             className="aspect-[4/5] w-full rounded-sm object-cover md:aspect-[5/6]"
           />
-          <span className="font-script absolute -bottom-6 left-4 text-6xl text-primary md:-left-10 md:text-7xl">
+          <span className="font-script absolute -bottom-6 left-4 hidden text-6xl md:block text-primary md:-left-10 md:text-7xl">
             Sidi
           </span>
         </div>
