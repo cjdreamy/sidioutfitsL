@@ -9,7 +9,7 @@ export const CATEGORIES = ["Handbags", "Dresses", "Outfits", "Keychains", "Acces
 export const formatKES = (n: number) =>
   "KSh " + Number(n).toLocaleString("en-KE", { maximumFractionDigits: 0 });
 
-export type BagItem = { product_id: string; name: string; price: number; image?: string; qty: number; max: number };
+export type BagItem = { product_id: string; name: string; price: number; image?: string | undefined; qty: number; max: number };
 
 type ShopCtx = {
   bag: BagItem[];

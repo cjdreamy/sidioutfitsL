@@ -28,7 +28,7 @@ function BagPage() {
 
   const book = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.phone.trim()) return toast.error("Please add your name and phone");
+    if (!form.name.trim() || !form.phone.trim()) { toast.error("Please add your name and phone"); return; }
     setBusy(true);
     const { error } = await supabase.rpc("place_order", {
       _name: form.name.trim(),
@@ -38,7 +38,7 @@ function BagPage() {
       _items: bag.map((i) => ({ product_id: i.product_id, qty: i.qty })),
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     clear();
     toast.success("Booked! We'll call you shortly.");
     navigate({ to: "/orders" });

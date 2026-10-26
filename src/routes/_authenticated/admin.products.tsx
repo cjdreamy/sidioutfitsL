@@ -142,14 +142,14 @@ function Editor({ p, onDone }: { p: Product; onDone: () => void }) {
 
   const save = async (publish?: boolean) => {
     const price = Number(f.price), quantity = parseInt(f.quantity, 10);
-    if (!f.name.trim() || isNaN(price) || price < 0 || isNaN(quantity) || quantity < 0) return toast.error("Check name, price and quantity");
+    if (!f.name.trim() || isNaN(price) || price < 0 || isNaN(quantity) || quantity < 0) { toast.error("Check name, price and quantity"); return; }
     setBusy(true);
     const { error } = await supabase.from("products").update({
       name: f.name.trim(), price, quantity, description: f.description, category: f.category, images: f.images,
       published: publish ?? f.published, updated_at: new Date().toISOString(),
     }).eq("id", p.id);
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Saved");
     onDone();
   };
@@ -157,7 +157,7 @@ function Editor({ p, onDone }: { p: Product; onDone: () => void }) {
   const del = async () => {
     if (!confirm("Delete this product?")) return;
     const { error } = await supabase.from("products").delete().eq("id", p.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     onDone();
   };
 

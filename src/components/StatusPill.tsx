@@ -8,5 +8,5 @@ const styles: Record<string, string> = {
 };
 
 export function StatusPill({ status }: { status: string }) {
-  return <span className={`eyebrow rounded-full px-2.5 py-1 ${styles[status] ?? styles.new}`}>{status}</span>;
+  return <span className={`eyebrow rounded-full px-2.5 py-1 ${styles[status] ?? styles["new"]}`}>{status}</span>;
 }

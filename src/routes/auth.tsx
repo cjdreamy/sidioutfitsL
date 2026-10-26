@@ -10,7 +10,7 @@ import { useShop } from "@/lib/shop";
 const safe = (r?: string) => (r && r.startsWith("/") && !r.startsWith("//") ? r : "/");
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (s: Record<string, unknown>) => ({ redirect: typeof s.redirect === "string" ? s.redirect : undefined }),
+  validateSearch: (s: Record<string, unknown>) => ({ redirect: typeof s["redirect"] === "string" ? (s["redirect"] as string) : undefined }),
   head: () => ({
     meta: [
       { title: "Sign in — Sidi Outfits" },
