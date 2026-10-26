@@ -53,6 +53,10 @@ function AdminOrders() {
               <Phone className="h-3.5 w-3.5" /> {o.phone}
             </a>
           </div>
+          <div className="mt-2 flex flex-wrap justify-between gap-x-3 text-xs text-muted-foreground">
+            <span>{o.payment_status}: deposit {formatKES(Number(o.deposit_amount))} + estimated fare {formatKES(Number(o.estimated_fare))}</span>
+            {o.mpesa_receipt && <span>M-Pesa receipt: {o.mpesa_receipt}</span>}
+          </div>
           <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto">
             {STATUSES.filter((s) => s !== o.status).map((s) => (
               <button key={s} onClick={() => setStatus(o.id, s)} className="shrink-0 rounded-full border px-3 py-1.5 text-xs capitalize hover:bg-secondary">

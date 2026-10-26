@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Minus, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { startMpesaPayment } from "@/lib/mpesa.functions";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatKES, useShop } from "@/lib/shop";
 import { Input } from "@/components/ui/input";
@@ -23,12 +24,16 @@ export const Route = createFileRoute("/bag")({
 function BagPage() {
   const { bag, setQty, remove, total, session, clear } = useShop();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", phone: "", location: "", note: "" });
+  const [form, setForm] = useState({ name: "", phone: "", location: "", note: "", estimatedFare: "" });
   const [busy, setBusy] = useState(false);
+  const fare = Number(form.estimatedFare) || 0;
+  const deposit = Math.ceil(total * 0.3);
 
   const book = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.phone.trim()) { toast.error("Please add your name and phone"); return; }
+    if (!form.estimatedFare.trim()) { toast.error("Enter an estimated fare, or 0 for pickup"); return; }
+    if (!Number.isFinite(fare) || fare < 0 || fare > 50000) { toast.error("Enter a valid estimated delivery fare"); return; }
     setBusy(true);
     const { error } = await supabase.rpc("place_order", {
       _name: form.name.trim(),
@@ -37,10 +42,21 @@ function BagPage() {
       _note: form.note.trim(),
       _items: bag.map((i) => ({ product_id: i.product_id, qty: i.qty })),
     });
+    if (error) { setBusy(false); toast.error(error.message); return; }
+    const orderId = data;
+    let payment: { success: boolean; message: string };
+    try {
+      payment = await startMpesaPayment({ data: { orderId, estimatedFare: fare } });
+    } catch {
+      payment = { success: false, message: "Please contact the shop to arrange payment." };
+    }
     setBusy(false);
-    if (error) { toast.error(error.message); return; }
     clear();
-    toast.success("Booked! We'll call you shortly.");
+    if (payment.success) {
+      toast.success("Order booked. Check your phone for the M-Pesa payment prompt.");
+    } else {
+      toast.error(`Order booked, but the M-Pesa prompt could not start: ${payment.message}`);
+    }
     navigate({ to: "/orders" });
   };
 
@@ -97,11 +113,17 @@ function BagPage() {
                   <Input placeholder="Your name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="h-12" />
                   <Input placeholder="Phone (e.g. 0712 345 678)" type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="h-12" />
                   <Input placeholder="Delivery area / pickup" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="h-12" />
+                  <Input placeholder="Estimated delivery fare (KSh; enter 0 for pickup)" type="number" min="0" max="50000" step="1" value={form.estimatedFare} onChange={(e) => setForm({ ...form, estimatedFare: e.target.value })} className="h-12" />
                   <Textarea placeholder="Note (size, colour…)" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} />
+                  <div className="rounded-md bg-secondary/60 p-3 text-sm">
+                    <div className="flex justify-between"><span>30% item deposit</span><span>{formatKES(deposit)}</span></div>
+                    <div className="mt-1 flex justify-between"><span>Estimated fare</span><span>{formatKES(fare)}</span></div>
+                    <div className="mt-2 flex justify-between border-t pt-2 font-medium"><span>Pay now by M-Pesa</span><span>{formatKES(deposit + fare)}</span></div>
+                  </div>
                   <button disabled={busy} className="w-full rounded-full bg-primary py-3.5 text-sm font-medium text-primary-foreground disabled:opacity-60">
-                    {busy ? "Booking…" : "Book order"}
+                    {busy ? "Booking and prompting…" : "Book & pay deposit"}
                   </button>
-                  <p className="text-center text-xs text-muted-foreground">Pay on delivery or pickup.</p>
+                  <p className="text-center text-xs text-muted-foreground">An M-Pesa prompt will request the 30% deposit plus your estimated fare. The final fare may be confirmed with you.</p>
                 </form>
               )}
             </div>

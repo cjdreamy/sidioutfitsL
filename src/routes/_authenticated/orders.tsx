@@ -55,6 +55,7 @@ function Orders() {
                 ))}
               </ul>
               <div className="mt-3 flex justify-between border-t pt-3 font-medium"><span>Total</span><span>{formatKES(Number(o.total))}</span></div>
+              <div className="mt-2 flex justify-between text-sm text-muted-foreground"><span>Payment</span><span>{o.payment_status === "paid" ? `Paid${o.mpesa_receipt ? ` · ${o.mpesa_receipt}` : ""}` : `${o.payment_status} · ${formatKES(Number(o.amount_due_now))} requested`}</span></div>
             </div>
           ))}
         </div>

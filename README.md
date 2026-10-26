@@ -24,3 +24,9 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## M-Pesa checkout
+
+Checkout requests a 30% deposit plus the customer's estimated delivery fare using Safaricom Daraja STK Push. Set these values as server-only environment variables (never prefix them with `VITE_`): `MPESA_CONSUMER_KEY`, `MPESA_CONSUMER_SECRET`, `MPESA_SHORTCODE`, `MPESA_PASSKEY`, `MPESA_CALLBACK_URL`, and optionally `MPESA_ENVIRONMENT` (`sandbox` by default; use `production` for live payments). `MPESA_CALLBACK_URL` must be a public HTTPS URL ending in `/api/mpesa/callback`. Configure the Safaricom app's callback/shortcode for that same environment. The M-Pesa account reference is `SidiOutfits`.
+
+Apply the new `drizzle/migrations/0002_order_payments.sql` migration to Supabase before using checkout. The callback also requires the server-side `SUPABASE_SERVICE_ROLE_KEY` already used by the server Supabase client. Deploy the app to a Node-compatible server runtime with the environment variables configured; do not expose payment credentials to the browser.

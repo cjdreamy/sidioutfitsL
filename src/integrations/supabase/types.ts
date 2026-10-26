@@ -61,11 +61,18 @@ export type Database = {
       }
       orders: {
         Row: {
+          amount_due_now: number
           created_at: string
           customer_name: string
+          deposit_amount: number
+          estimated_fare: number
           id: string
           location: string
           note: string
+          checkout_request_id: string | null
+          mpesa_receipt: string | null
+          payment_phone: string | null
+          payment_status: string
           phone: string
           seen: boolean
           status: string
@@ -73,11 +80,18 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          amount_due_now?: number
           created_at?: string
           customer_name: string
+          deposit_amount?: number
+          estimated_fare?: number
           id?: string
           location?: string
           note?: string
+          checkout_request_id?: string | null
+          mpesa_receipt?: string | null
+          payment_phone?: string | null
+          payment_status?: string
           phone: string
           seen?: boolean
           status?: string
@@ -85,11 +99,18 @@ export type Database = {
           user_id: string
         }
         Update: {
+          amount_due_now?: number
           created_at?: string
           customer_name?: string
+          deposit_amount?: number
+          estimated_fare?: number
           id?: string
           location?: string
           note?: string
+          checkout_request_id?: string | null
+          mpesa_receipt?: string | null
+          payment_phone?: string | null
+          payment_status?: string
           phone?: string
           seen?: boolean
           status?: string
@@ -160,6 +181,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      fail_order_payment_request: {
+        Args: { _order_id: string }
+        Returns: undefined
+      }
+      finish_order_payment_request: {
+        Args: { _checkout_request_id: string; _order_id: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -176,6 +205,10 @@ export type Database = {
           _phone: string
         }
         Returns: string
+      }
+      prepare_order_payment: {
+        Args: { _estimated_fare: number; _order_id: string }
+        Returns: { order_id: string; phone: string; total: number }[]
       }
     }
     Enums: {
