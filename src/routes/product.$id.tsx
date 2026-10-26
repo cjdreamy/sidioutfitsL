@@ -57,7 +57,7 @@ function ProductPage() {
                   key={i}
                   src={src}
                   alt={`${p.name} ${i + 1}`}
-                  className={`aspect-[4/5] w-full shrink-0 snap-center bg-secondary object-cover md:${i === active ? "block" : "hidden"}`}
+                  className={`aspect-[4/5] w-full shrink-0 snap-center bg-secondary object-cover ${i === active ? "md:block" : "md:hidden"}`}
                 />
               ))}
             </div>
